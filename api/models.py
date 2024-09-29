@@ -18,9 +18,9 @@ class Household(models.Model):
 
 #doc INVITATION
 class Invitation(models.Model):
-    sender = models.ForeignKey(Parent, related_name='invitation_sent') #doc PARENT SENDER
-    recipient = models.ForeignKey(Parent, related_name='invitations_received') #doc PARENT RECIPIENT
-    household = models.ForeignKey(Household) # doc HOUSE HOLD RELATED TO THE INVITATION
+    sender = models.ForeignKey(Parent, related_name='invitation_sent', on_delete=models.CASCADE) #doc PARENT SENDER
+    recipient = models.ForeignKey(Parent, related_name='invitations_received', on_delete=models.CASCADE) #doc PARENT RECIPIENT
+    household = models.ForeignKey(Household, on_delete=models.CASCADE) # doc HOUSE HOLD RELATED TO THE INVITATION
     created_at = models.DateField(auto_now_add=True) #doc CREATION DATE
     accepted = models.BooleanField(default=False) #doc ACCEPTED : TRUE OR FALSE
 

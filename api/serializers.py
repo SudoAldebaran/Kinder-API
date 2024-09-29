@@ -9,19 +9,19 @@ class ParentSerializer(serializers.ModelSerializer):
         model = Parent 
         fields = ['id', 'name', 'email']
 
-#doc PARENT SERIALIZER
+#doc CHILD SERIALIZER
 class ChildSerializer(serializers.ModelSerializer):
     class Meta:
         model = Child
         fields = ['id', 'name', 'parent']
 
-#doc PARENT SERIALIZER
+#doc HOUSEHOLD SERIALIZER
 class HouseholdSerializer(serializers.ModelSerializer):
     class Meta:
         model = Household
         fields = ['id', 'parent1', 'parent2']
 
-#doc PARENT SERIALIZER
+#doc INVITATION SERIALIZER
 class InvitationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invitation
