@@ -13,7 +13,7 @@ class ParentSerializer(serializers.ModelSerializer):
 class ChildSerializer(serializers.ModelSerializer):
     class Meta:
         model = Child
-        fields = ['id', 'name', 'parent']
+        fields = ['id', 'name', 'age', 'parent']
 
 #doc HOUSEHOLD SERIALIZER
 class HouseholdSerializer(serializers.ModelSerializer):
