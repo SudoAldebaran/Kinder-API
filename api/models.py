@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 #doc PARENTS
 class Parent(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True) #doc EVERY USER IS A PARENT
+    user = models.OneToOneField(User, on_delete=models.CASCADE) #doc EVERY USER IS A PARENT
     name = models.CharField(max_length=100) #doc PARENT NAME
     email = models.EmailField(unique=True) #doc PARENT EMAIL : MUST BE UNIQUE
 

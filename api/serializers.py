@@ -23,14 +23,24 @@ class HouseholdSerializer(serializers.ModelSerializer):
 
 #doc INVITATION SERIALIZER
 class InvitationSerializer(serializers.ModelSerializer):
-
     recipient = serializers.PrimaryKeyRelatedField(queryset=Parent.objects.all())
     household = serializers.PrimaryKeyRelatedField(queryset=Household.objects.all())
 
     class Meta:
         model = Invitation
         fields = ['id', 'sender', 'recipient', 'household', 'created_at', 'accepted']
+        read_only_fields = ['sender', 'created_at', 'accepted']  # Assure-toi que 'sender' est en lecture seule
 
     def create(self, validated_data):
-        validated_data['sender'] = self.context['request'].user # Définit l'expéditeur à l'utilisateur authentifié
-        return super().create(validated_data) # Appelle la méthode create de la classe parente
+        # Récupère l'utilisateur authentifié
+        user = self.context['request'].user
+        
+        # Récupère l'instance Parent associée à l'utilisateur
+        try:
+            sender = Parent.objects.get(user=user)
+        except Parent.DoesNotExist:
+            raise serializers.ValidationError("No Parent associated with this user")
+
+        # Associe l'invitation avec l'expéditeur (sender) et continue la création
+        validated_data['sender'] = sender
+        return super().create(validated_data)

@@ -26,7 +26,7 @@ class HouseholdList(generics.ListAPIView): #doc Cette vue générique permet à 
     queryset = Household.objects.all() #doc Définit l'ensemble des objets à renvoyer dans la vue. Ici, tous les objets Parent de la base de données seront renvoyés par la vue.
     serializer_class = HouseholdSerializer #doc Indique à la vue d'utiliser le serializer ParentSerializer pour transformer les instances du modèle Parent en JSON, et vice-versa lors de la création d'un objet.
 
-class InvitationList(generics.ListAPIView):
+class InvitationList(generics.ListCreateAPIView):
     serializer_class = InvitationSerializer
     permission_classes = [IsAuthenticated]
 
@@ -34,10 +34,27 @@ class InvitationList(generics.ListAPIView):
         user = self.request.user
         try:
             parent = Parent.objects.get(user=user)
-        except:
+        except Parent.DoesNotExist:
             raise ValueError("No Parent associated with this user")
-        return Invitation.objects.filter(recipient=self.request.user)  # Filtre par l'utilisateur connecté
+        return Invitation.objects.filter(recipient=parent)  # Filtre par l'utilisateur connecté
+    
+    def perform_create(self, serializer):
+        recipient_id = self.request.data.get('recipient')
+        household_id = self.request.data.get('household')
 
+        try:
+            recipient = Parent.objects.get(id=recipient_id)
+        except Parent.DoesNotExist:
+            raise ValueError("No Parent found with this ID")
+
+        try:
+            household = Household.objects.get(id=household_id)
+        except Household.DoesNotExist:
+            raise ValueError("No Household found with this ID")
+
+        serializer.save(recipient=recipient, household=household)
+
+     
 
 #doc ALL CHILDREN BY PARENTS
 class ChildrenParentsList(generics.ListCreateAPIView):
@@ -59,17 +76,3 @@ class ParentDetail(generics.RetrieveUpdateDestroyAPIView):
 class ChildDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Child.objects.all()
     serializer_class = ChildSerializer
-
-#doc INVITATION CREATE
-class InvitationCreate(generics.CreateAPIView):
-    serializer_class = InvitationSerializer
-
-    def perform_create(self, serializer):
-        recipient_id = self.request.data.get('recipient_id')
-        household_id = self.request.data.get('household_id')
-
-        # Vérifie que le ménage et le parent existent
-        recipient = Parent.objects.get(id=recipient_id)
-        household = Household.objects.get(id=household_id)
-
-        serializer.save(sender=self.request.user, recipient=recipient, household=household)
