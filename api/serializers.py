@@ -23,7 +23,14 @@ class HouseholdSerializer(serializers.ModelSerializer):
 
 #doc INVITATION SERIALIZER
 class InvitationSerializer(serializers.ModelSerializer):
+
+    recipient = serializers.PrimaryKeyRelatedField(queryset=Parent.objects.all())
+    household = serializers.PrimaryKeyRelatedField(queryset=Household.objects.all())
+
     class Meta:
         model = Invitation
         fields = ['id', 'sender', 'recipient', 'household', 'created_at', 'accepted']
 
+    def create(self, validated_data):
+        validated_data['sender'] = self.context['request'].user # Définit l'expéditeur à l'utilisateur authentifié
+        return super().create(validated_data) # Appelle la méthode create de la classe parente
