@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
+
 #doc MODELS : TABLES FROM THE DATABASE
 from .models import Parent, Child, Household, Invitation
 
@@ -54,8 +55,6 @@ class InvitationList(generics.ListCreateAPIView):
 
         serializer.save(recipient=recipient, household=household)
 
-     
-
 #doc ALL CHILDREN BY PARENTS
 class ChildrenParentsList(generics.ListCreateAPIView):
     serializer_class = ChildSerializer
@@ -76,3 +75,33 @@ class ParentDetail(generics.RetrieveUpdateDestroyAPIView):
 class ChildDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Child.objects.all()
     serializer_class = ChildSerializer
+
+#doc INVITATION DETAILS
+class InvitationDetail(generics.RetrieveAPIView):
+    queryset = Invitation.objects.all()
+    serializer_class = InvitationSerializer
+
+#doc ACCEPT INVITATION
+class AcceptInvitationView(generics.UpdateAPIView):
+    permission_classes = [IsAuthenticated]  # Assure que l'utilisateur est authentifié
+    queryset = Invitation.objects.all()  # Le queryset des invitations
+    serializer_class = InvitationSerializer
+
+    def update(self, request, *args, **kwargs):
+        # Récupérer l'invitation via son ID
+        invitation_id = kwargs.get('pk')  # Récupère l'ID de l'invitation depuis l'URL
+        try:
+            invitation = Invitation.objects.get(id=invitation_id)
+        except Invitation.DoesNotExist:
+            return Response({'error': 'Invitation not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Vérifie que l'utilisateur actuel est bien le destinataire de l'invitation
+        if invitation.recipient.user != request.user:
+            return Response({'error': 'You are not authorized to accept this invitation'}, status=status.HTTP_403_FORBIDDEN)
+
+        # Accepte l'invitation en mettant à jour le champ `accepted` à True
+        invitation.accepted = True
+        invitation.save()
+
+        # Retourne la réponse avec succès
+        return Response({'message': 'Invitation accepted successfully'}, status=status.HTTP_200_OK)
