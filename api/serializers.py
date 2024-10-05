@@ -28,18 +28,18 @@ class InvitationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invitation
         fields = ['id', 'sender', 'recipient', 'created_at', 'accepted']
-        read_only_fields = ['sender', 'created_at', 'accepted']  # Assure-toi que 'sender' est en lecture seule
+        read_only_fields = ['sender', 'created_at', 'accepted'] 
 
     def create(self, validated_data):
-        # Récupère l'utilisateur authentifié
+        #doc GET THE AUTHENTICATED USER
         user = self.context['request'].user
         
-        # Récupère l'instance Parent associée à l'utilisateur
+        #doc GET THE PARENT INSTANCE ASSOCIATED WITH THE USER
         try:
             sender = Parent.objects.get(user=user)
         except Parent.DoesNotExist:
             raise serializers.ValidationError("No Parent associated with this user")
 
-        # Associe l'invitation avec l'expéditeur (sender) et continue la création
+        #doc ASSOCIATE THE INVITATION WITH THE SENDER AND CONTINUE CREATION
         validated_data['sender'] = sender
-        return super().create(validated_data)
+        return super().create(validated_data)  #doc CALL THE PARENT CLASS CREATE METHOD
