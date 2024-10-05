@@ -20,6 +20,6 @@ urlpatterns = [
 
     #doc INVITATIONS URL
     path('invitations/', InvitationList.as_view()), #doc INVITATIONS URL
-    path('invitations/<int:pk>/', InvitationDetail.as_view()), #doc SPECIFIC INVITATION DETAIL
-    path('invitations/<int:pk>/accept/', AcceptInvitationView().as_view()) #doc ACCEPT INVITATION
+    path('invitations/<int:pk>/', InvitationDetail.as_view()), #doc INVITATION DETAIL + DECLINE INVITATION
+    path('invitations/<int:pk>/accept/', AcceptInvitationView().as_view()), #doc ACCEPT INVITATION
 ]

@@ -24,11 +24,10 @@ class HouseholdSerializer(serializers.ModelSerializer):
 #doc INVITATION SERIALIZER
 class InvitationSerializer(serializers.ModelSerializer):
     recipient = serializers.PrimaryKeyRelatedField(queryset=Parent.objects.all())
-    household = serializers.PrimaryKeyRelatedField(queryset=Household.objects.all())
 
     class Meta:
         model = Invitation
-        fields = ['id', 'sender', 'recipient', 'household', 'created_at', 'accepted']
+        fields = ['id', 'sender', 'recipient', 'created_at', 'accepted']
         read_only_fields = ['sender', 'created_at', 'accepted']  # Assure-toi que 'sender' est en lecture seule
 
     def create(self, validated_data):
